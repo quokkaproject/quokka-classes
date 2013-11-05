@@ -27,6 +27,9 @@ class ClassRoom(Slugged, Publishable, db.EmbeddedDocument):
     def clean(self):
         self.validate_slug()
 
+    def __unicode__(self):
+        return self.title
+
 
 class CourseVariant(Slugged, db.EmbeddedDocument):
     title = db.StringField(required=True, unique=True, max_length=100)
@@ -35,6 +38,10 @@ class CourseVariant(Slugged, db.EmbeddedDocument):
 
     def get_description(self):
         return "<br>".join([self.title, self.description])
+
+    def __unicode__(self):
+        return self.title
+
 
 class Course(BaseProduct):
     pre_requisites = db.StringField()
@@ -56,10 +63,22 @@ class Course(BaseProduct):
             raise db.ValidationError("Variants slugs duplicated")
 
 
+class Subscriber(db.DynamicDocument):
+    name = db.StringField()
+    email = db.EmailField()
+    document = db.StringField()
+    phone = db.StringField()
+    address = db.StringField()
+    user = db.ReferenceField('User', default=get_current_user)
+
+    def __unicode__(self):
+        return self.name
+
+
 class CourseSubscription(BaseProductReference,
                          Publishable, db.DynamicDocument):
-    belongs_to = db.ReferenceField('User', default=get_current_user)
-    student_user = db.ReferenceField('User', default=get_current_user)
+    subscriber = db.ReferenceField(Subscriber)
+    student = db.ReferenceField(Subscriber)
     course = db.ReferenceField(Course, required=True)
     classroom = db.StringField()
     variant = db.EmbeddedDocumentField(CourseVariant)
@@ -68,6 +87,11 @@ class CourseSubscription(BaseProductReference,
     total_value = db.FloatField()
     cart = db.ReferenceField(Cart)
     confirmed_date = db.DateTimeField()
+
+
+    def __unicode__(self):
+        if self.variant:
+            return u"{s.course.title} {s.classroom} {s.variant}".format(s=self)
 
     def get_title(self):
         return self.course.get_title()
