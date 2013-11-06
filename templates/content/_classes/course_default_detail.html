@@ -9,7 +9,7 @@
                     <h1>{{ content.title }}<span>.</span></h1>
                 </div>
             </div>
-            <div class="row">
+            <div class="row site-content-body">
                 <div class="span12">
                     <form action="{{url_for('classes.subscribe')}}" method="POST" class="form-horizontal">
                         <input type="hidden" name="course_id" value="{{ content.id }}">
