@@ -24,6 +24,10 @@ class ClassRoom(Slugged, Publishable, db.EmbeddedDocument):
     end_date = db.DateTimeField()
     status = db.StringField()
 
+    def get_weekdays_display(self):
+        data = dict(self.WEEKDAYS)
+        return [data.get(k) for k in self.weekdays]
+
     def clean(self):
         self.validate_slug()
 
@@ -32,7 +36,7 @@ class ClassRoom(Slugged, Publishable, db.EmbeddedDocument):
 
 
 class CourseVariant(Slugged, db.EmbeddedDocument):
-    title = db.StringField(required=True, unique=True, max_length=100)
+    title = db.StringField(required=True, max_length=100)
     description = db.StringField()
     unity_value = db.FloatField()
 
@@ -91,6 +95,8 @@ class CourseSubscription(BaseProductReference,
     def __unicode__(self):
         if self.variant:
             return u"{s.course.title} {s.classroom} {s.variant}".format(s=self)
+        else:
+            return self.course.title
 
     def get_title(self):
         return self.course.get_title()

@@ -1,0 +1,107 @@
+{% extends theme("base.html") %}
+{% import theme("_forms.html") as forms %}
+
+{% block page_header %}
+<div class="large-12 columns">
+  <div class="page-header">
+    <h1>{{ content.title }}</h1>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="large-12 columns">
+
+<form action="{{url_for('classes.subscribe')}}" method="POST">
+
+  <input type="hidden" name="course_id" value="{{content.id}}">
+
+<fieldset>
+<legend>Course info</legend>
+  <ul>
+    <li>Summary: {{content.summary}}</li>
+    <li>Description: <p>{{ content.description|safe() }}</p></li>
+    <li>Duração: {{content.duration}}</li>
+    <li>Pré requisitos: {{content.pre_requisites|safe()}}</li>
+  </ul>
+
+</fieldset>
+
+<fieldset>
+<legend>Options</legend>
+<ul>
+ <li>Modalities:
+	<ul>
+	  <li> <label for="variant_regular"> Regular: ${{content.get_unity_value()}} <input type="radio" name="variant" value="regular" id="variant_regular" required></label></li>
+	  {% for variant in content.variants %}
+	  <li> <label for="variant_{{variant.slug}}"> {{variant.title}}: ${{variant.unity_value}} <input type="radio" name="variant" value="{{variant.slug}}" id="variant_{{variant.slug}}"></label></li>
+	  {% endfor %}
+	</ul>
+    </li>
+    <li>Schedule:
+	<ul>
+	 {% for classroom in content.classes %}
+
+	    <li>
+	       <label for="classroom_{{classroom.slug}}">
+		   <input type="radio" id="classroom_{{classroom.slug}}" name="classroom" value="{{classroom.slug}}" required>
+		   {{classroom.title}}
+	       </label>
+	       description: {{classroom.description}}<br />
+	       Start: {{classroom.start_date}}<br />
+	       End: {{classroom.end_date}}<br />
+	       Weekdays:<br />
+		  {% for weekday in classroom.get_weekdays_display() %}
+		       {{weekday}}
+		  {% endfor %}
+	       <hr/>
+	   </li>
+	 {% endfor %}
+	</ul>
+    </li>
+
+ </ul>
+</fieldset>
+
+<fieldset>
+    <legend>Your data</legend>
+
+   <label>Name</label> <input type="text" name="name" required>
+   <label>Email</label> <input type="email" name="email" required>
+   <label>Phone</label> <input type="text" name="phone" required>
+
+</fieldset>
+
+<input type="submit" value="Subscribe" class="btn button">
+
+
+</form>
+
+
+
+<p><img width="300" src="{{ content.get_main_image_url(thumb=False, default='http://placehold.it/300x300') }}" /><p>
+
+
+  <p>{{ content.created_at.strftime('%H:%M %Y-%m-%d') }}</p>
+
+
+  <hr>
+  <h2>Comments</h2>
+  {% if content.comments %}
+    {% for comment in content.comments %}
+       <p>{{ comment.body }}</p>
+       <p><strong>{{ comment.author }}</strong> <small>on {{ comment.created_at.strftime('%H:%M %Y-%m-%d') }}</small></p>
+      {{ comment.text }}
+    {% endfor %}
+  {% endif %}
+
+    <hr>
+    <h2>Add a comment</h2>
+    <form action="{{content.get_absolute_url()}}" method="post">
+      {{ forms.render(form) }}
+      <div class="actions">
+	<input type="submit" class="button" value="comment">
+      </div>
+    </form>
+</div>
+{% endblock %}
