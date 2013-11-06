@@ -88,7 +88,6 @@ class CourseSubscription(BaseProductReference,
     cart = db.ReferenceField(Cart)
     confirmed_date = db.DateTimeField()
 
-
     def __unicode__(self):
         if self.variant:
             return u"{s.course.title} {s.classroom} {s.variant}".format(s=self)

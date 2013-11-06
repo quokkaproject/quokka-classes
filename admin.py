@@ -3,7 +3,7 @@
 from quokka import admin
 from quokka.core.admin.models import ModelAdmin
 from quokka.core.admin import _, _l
-from quokka.modules.cart.admin import ProductAdmin
+#from quokka.modules.cart.admin import ProductAdmin
 from .models import Course, CourseSubscription
 
 
