@@ -19,13 +19,22 @@ class ClassRoom(Slugged, Publishable, db.EmbeddedDocument):
     )
     title = db.StringField(required=True, max_length=100)
     description = db.StringField()
-    weekdays = db.ListField(db.StringField(choices=WEEKDAYS))
+    weekdays = db.ListField(db.StringField(choices=WEEKDAYS), default=[])
     start_date = db.DateTimeField()
     end_date = db.DateTimeField()
     status = db.StringField()
 
-    def get_weekdays_display(self):
+    def get_description(self):
+        return "<br>".join(
+            [self.title,
+             self.description,
+             ",".join(self.weekdays),
+             self.start_date.strftime("%Y-%m-%d") if self.start_date else '']
+        )
+
+    def get_weekdays_display(self, **kwargs):
         data = dict(self.WEEKDAYS)
+        data.update(kwargs)
         return [data.get(k) for k in self.weekdays]
 
     def clean(self):
@@ -52,6 +61,18 @@ class Course(BaseProduct):
     duration = db.StringField()
     classes = db.ListField(db.EmbeddedDocumentField(ClassRoom))
     variants = db.ListField(db.EmbeddedDocumentField(CourseVariant))
+
+    def get_description(self, *args, **kwargs):
+
+        try:
+            classroom = self.classes.get(slug=kwargs.get('classroom'))
+        except:
+            pass
+
+        if not classroom:
+            return self.description
+
+        return "".join([self.description, classroom.get_description()])
 
     def is_unique_slug(self, items):
         if not items:
@@ -92,6 +113,9 @@ class CourseSubscription(BaseProductReference,
     cart = db.ReferenceField(Cart)
     confirmed_date = db.DateTimeField()
 
+    def clean(self):
+        self.unity_value = self.get_unity_value()
+
     def __unicode__(self):
         if self.variant:
             return u"{s.course.title} {s.classroom} {s.variant}".format(s=self)
@@ -103,8 +127,9 @@ class CourseSubscription(BaseProductReference,
 
     def get_description(self):
         return "<br>".join(
-            [self.course.get_description(),
-             self.variant.get_description() if self.variant else '']
+            [self.course.get_description(classroom=self.classroom),
+             self.variant.get_description() if self.variant else '',
+             self.student.name if self.student else '']
         )
 
     def get_unity_value(self):
