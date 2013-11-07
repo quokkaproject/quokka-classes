@@ -67,12 +67,31 @@ class Course(BaseProduct):
         try:
             classroom = self.classes.get(slug=kwargs.get('classroom'))
         except:
-            pass
+            classroom = None
 
         if not classroom:
             return self.description
 
         return "".join([self.description, classroom.get_description()])
+
+    def get_summary(self, *args, **kwargs):
+
+        try:
+            classroom = self.classes.get(slug=kwargs.get('classroom'))
+        except:
+            classroom = None
+
+        summary = getattr(self, 'summary', None)
+        if not summary:
+            try:
+                return self.get_description(*args, **kwargs)[:140]
+            except:
+                summary = self.title
+
+        if not classroom:
+            return summary
+
+        return "<br>".join([summary, classroom.get_description()])
 
     def is_unique_slug(self, items):
         if not items:
@@ -127,7 +146,7 @@ class CourseSubscription(BaseProductReference,
 
     def get_description(self):
         return "<br>".join(
-            [self.course.get_description(classroom=self.classroom),
+            [self.course.get_summary(classroom=self.classroom),
              self.variant.get_description() if self.variant else '',
              self.student.name if self.student else '']
         )
