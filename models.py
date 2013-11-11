@@ -113,7 +113,8 @@ class Subscriber(db.DynamicDocument):
     document = db.StringField()
     phone = db.StringField()
     address = db.StringField()
-    user = db.ReferenceField('User', default=get_current_user)
+    user = db.ReferenceField('User', default=get_current_user,
+                             reverse_delete_rule=db.NULLIFY)
 
     def __unicode__(self):
         return self.name
@@ -121,15 +122,16 @@ class Subscriber(db.DynamicDocument):
 
 class CourseSubscription(BaseProductReference,
                          Publishable, db.DynamicDocument):
-    subscriber = db.ReferenceField(Subscriber)
-    student = db.ReferenceField(Subscriber)
-    course = db.ReferenceField(Course, required=True)
+    subscriber = db.ReferenceField(Subscriber, reverse_delete_rule=db.NULLIFY)
+    student = db.ReferenceField(Subscriber, reverse_delete_rule=db.NULLIFY)
+    course = db.ReferenceField(Course, required=True,
+                               reverse_delete_rule=db.DENY)
     classroom = db.StringField()
     variant = db.EmbeddedDocumentField(CourseVariant)
     status = db.StringField(default="pending")
     unity_value = db.FloatField()
     total_value = db.FloatField()
-    cart = db.ReferenceField(Cart)
+    cart = db.ReferenceField(Cart, reverse_delete_rule=db.NULLIFY)
     confirmed_date = db.DateTimeField()
 
     def clean(self):
