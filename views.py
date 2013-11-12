@@ -2,7 +2,7 @@
 import random
 from flask import request, url_for, redirect, current_app
 from flask.views import MethodView
-
+from flask.ext.security.utils import login_user
 from quokka.utils import get_current_user
 from quokka.core.templates import render_template
 from quokka.modules.cart.models import Cart, Item
@@ -131,9 +131,11 @@ class SubscribeView(MethodView):
             user = User.objects.create(
                 name=name,
                 email=email,
+                password=""
             )
 
-        # autenticar e mandar email password
+            # autenticar e mandar email password
+            login_user(user)
 
         return Subscriber.objects.create(
             name=name,
