@@ -43,7 +43,6 @@ class SetSubscriber(CartPipeline):
 
         return self.go()
 
-
     def get_subscriber(self, user, **kwargs):
         if not user:
             return None
