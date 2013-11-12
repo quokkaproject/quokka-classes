@@ -58,7 +58,7 @@ class CourseVariant(Slugged, db.EmbeddedDocument):
 
 class Course(BaseProduct):
     pre_requisites = db.StringField()
-    duration = db.StringField()
+    duration = db.StringField(max_length=255)
     classes = db.ListField(db.EmbeddedDocumentField(ClassRoom))
     variants = db.ListField(db.EmbeddedDocumentField(CourseVariant))
 
