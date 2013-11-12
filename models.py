@@ -49,6 +49,9 @@ class CourseVariant(Slugged, db.EmbeddedDocument):
     description = db.StringField()
     unity_value = db.FloatField()
 
+    def clean(self):
+        self.validate_slug()
+
     def get_description(self):
         return "<br>".join([self.title, self.description])
 

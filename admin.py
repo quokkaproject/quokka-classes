@@ -65,7 +65,7 @@ class CourseSubscriptionAdmin(ModelAdmin):
     ]
 
     form_columns = [
-        'course', 'classroom', 'variant',
+        'course', 'classroom',
         'student', 'subscriber',
         'status', 'confirmed_date',
         'unity_value',
