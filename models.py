@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import datetime
 from quokka.core.db import db
 from quokka.utils import get_current_user
 from quokka.core.models import Publishable, Slugged
@@ -178,5 +178,6 @@ class CourseSubscription(BaseProductReference,
     def set_status(self, status, *args, **kwargs):
         self.status = status
         if status == "confirmed":
-            self.confirmed_date = kwargs.get('date')
+            now = datetime.datetime.now()
+            self.confirmed_date = kwargs.get('date', now)
         self.save()
